@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgres"
+  url      = env("DATABASE_URL")
+}
+
+model studant {
+  id            Int             @id @default(autoincrement())
+  name          String
+  email         String          @unique
+  brith_date    DateTime?
+  studant_hobby studant_hobby[]
+  turmaId       Int?
+  turma         turma?          @relation(fields: [turmaId], references: [id])
+}
+
+model studant_hobby {
+  id        Int      @id @default(autoincrement())
+  studantId Int?
+  studant   studant? @relation(fields: [studantId], references: [id])
+  hobbyId   Int?
+  hobby     hobby?   @relation(fields: [hobbyId], references: [id])
+}
+
+model hobby {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique
+  studant_hobby studant_hobby[]
+}
+
+model turma {
+  id      Int       @id @default(autoincrement())
+  name    String
+  module  String    @default("0")
+  teacher teacher[]
+  studant studant[]
+
+  @@map("room")
+}
+
+model teacher {
+  id             Int              @id @default(autoincrement())
+  name           String
+  email          String           @unique
+  brith_date     DateTime?
+  turmaId        Int?
+  turma          turma?           @relation(fields: [turmaId], references: [id])
+  teacher_skills teacher_skills[]
+}
+
+model teacher_skills {
+  id        Int      @id @default(autoincrement())
+  teacherId Int?
+  teacher   teacher? @relation(fields: [teacherId], references: [id])
+  skillId   Int?
+  skill     skill?   @relation(fields: [skillId], references: [id])
+}
+
+model skill {
+  id             Int              @id @default(autoincrement())
+  name           String
+  teacher_skills teacher_skills[]
+}
